@@ -15,14 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
-        const activityCard = document.createElement("div");
-        activityCard.className = "activity-card";
+        const activityCard = renderActivityCard({
+          name,
+          description: details.description,
+          participants: details.participants,
+        });
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
+        activityCard.innerHTML += `
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
@@ -39,6 +40,41 @@ document.addEventListener("DOMContentLoaded", () => {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
       console.error("Error fetching activities:", error);
     }
+  }
+
+  function renderActivityCard(activity) {
+    const card = document.createElement('div');
+    card.className = 'activity-card';
+
+    const title = document.createElement('h4');
+    title.textContent = activity.name;
+    card.appendChild(title);
+
+    const description = document.createElement('p');
+    description.textContent = activity.description;
+    card.appendChild(description);
+
+    // Add participants section
+    if (activity.participants && activity.participants.length > 0) {
+      const participantsSection = document.createElement('div');
+      participantsSection.className = 'participants';
+
+      const participantsTitle = document.createElement('h5');
+      participantsTitle.textContent = 'Participants:';
+      participantsSection.appendChild(participantsTitle);
+
+      const participantsList = document.createElement('ul');
+      activity.participants.forEach(participant => {
+        const listItem = document.createElement('li');
+        listItem.textContent = participant;
+        participantsList.appendChild(listItem);
+      });
+      participantsSection.appendChild(participantsList);
+
+      card.appendChild(participantsSection);
+    }
+
+    return card;
   }
 
   // Handle form submission
